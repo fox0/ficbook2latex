@@ -1,0 +1,56 @@
+% pdflatex
+\documentclass[twoside,a5paper,11pt]{book}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel} 
+
+\usepackage[twoside, includehead, margin=10mm, left=20mm, headsep=1mm]{geometry}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+\lhead[\thepage]{\nouppercase{\rightmark}}
+\chead{}
+\rhead[\nouppercase{\rightmark}]{\thepage}  % TODO
+
+\cfoot{} % TODO
+
+
+\usepackage{indentfirst}
+\usepackage{subfig}
+
+
+\renewcommand{\numberline}[1]{}
+
+\makeatletter
+\renewcommand{\@seccntformat}[1]{}
+\makeatother
+
+
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\normalfont\fontsize{14}{17}\bfseries}{}{0pt}{\fontsize{14}{17}}
+\titleformat{\section}{\normalfont\fontsize{14}{17}\bfseries}{}{0pt}{}
+
+
+
+\titlespacing*{\chapter}{0pt}{-30pt}{8pt}
+\titlespacing*{\section}{0pt}{*4}{*4}
+
+
+% так меньше badboxes
+\hfuzz=2pt
+
+
+\title{##title##}
+\author{##author##}
+\date{}
+
+\begin{document}
+\maketitle
+##description##
+\tableofcontents
+\newpage
+##body##
+\end{document}
