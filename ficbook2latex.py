@@ -1,38 +1,60 @@
 #!/usr/bin/env python3
 import re
-import argparse
+
+import requests
+from bs4 import BeautifulSoup
 
 
-def main(text):
+def main(url):
+    r = requests.get(url)
+    r.raise_for_status()
+    soup = BeautifulSoup(r.text, 'lxml')
+
+    context = {
+        'title': soup.select('title')[0].text.split('\n')[0].strip(),
+        'author': soup.select('a.avatar-nickname')[0].text,
+        'description': soup.select('div.description')[0].text.replace('<br/><br/>', '\n\n'),
+        'url': url,
+        'chapters': [],
+    }
+
+    for i in soup.select('a.visit-link'):
+        url = 'https://ficbook.net' + i['href']
+        r = requests.get(url)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, 'lxml')
+
+        text = ''.join(map(str, soup.select('div#content')[0].contents))
+
+        text = text.replace('<br/>', '').replace('\r', '')
+        text = text.replace('<p align="center" style="margin: 0px;">***</p>', r'\begin{center}* * *\end{center}')
+        text = re.sub(r'<i>(.+?)</i>', r'\\textit{\1}', text)
+        text = text.replace('а́', r'\textit{а}')
+        text = text.replace('á', r'\textit{а}')
+        text = text.replace('о́', r'\textit{о}')
+        text = text.replace('я́', r'\textit{я}')
+        text = text.replace('е́', r'\textit{е}')
+        text = text.replace('у́́', r'\textit{у}')
+
+        context['chapters'].append(r'''
+\chapter{%s}
+\thispagestyle{empty}
+%s''' % (soup.select('h2')[0].text, text))
+
+    context['chapters'] = '\n\n\n\n'.join(context['chapters'])
+    save(context)
+
+
+def save(context):
     with open('template.tex') as f:
-        out = f.read()
+        t = f.read()
 
-    for k, v in get_context(text).items():
-        out = out.replace('##%s##' % k, v)
+    for k, v in context.items():
+        t = t.replace('##%s##' % k, v)
 
     with open('out.tex', 'w') as f:
-        f.write(out)
-
-
-def get_context(text):
-    header, body = re.split(r'={10}', text, 1)
-    body = '='*10 + body
-    body = re.sub(r'={10}\s(.*?)\s={10}', r'\section{\1}', body)
-    # \begin{center}* * *\end{center}\vspace{-1em}
-    body = body.replace('_', '\_')
-
-    ls = header.split('\n', 25)
-    return {
-        'author': re.findall(r'Автор:\s(.*?)\s\(', header, re.UNICODE)[0],
-        'title': ls[1],
-        'description': ls[19],
-        'body': body,
-    }
+        f.write(t)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filename')
-    args = parser.parse_args()
-    with open(args.filename) as f:
-        main(f.read())
+    main(url='https://ficbook.net/readfic/8251369')
