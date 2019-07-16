@@ -4,15 +4,19 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel} 
 
-\usepackage[twoside, includehead, margin=10mm, left=25mm, headsep=2mm]{geometry}
+\usepackage[twoside, includehead, margin=10mm, left=25mm, bottom=10mm, headsep=2mm]{geometry}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[LE,RO]{\thepage}
-\fancyhead[RE,LO]{\fontsize{10}{12}\leftmark}
+\fancyhead[RE,LO]{\fontsize{10}{12}\rightmark}
 
 \usepackage{indentfirst}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{20pt}{10pt} % 50 40
 
 \hfuzz=7pt
 
@@ -32,10 +36,15 @@
 
 % TODO
 
-\begin{flushright}##url##\end{flushright}
+\begin{flushright}
+##url##
+\end{flushright}
 
 
 \tableofcontents
+
+
+\chapter{##title##}
 \thispagestyle{empty}
 
 
